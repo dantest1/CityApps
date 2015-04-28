@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<server xmlns="urn:jboss:domain:1.2">
+
+
+.....
+
+
+        <subsystem xmlns="urn:jboss:domain:datasources:1.0">
+            <datasources>
+            
+            
+                <datasource jndi-name="java:jboss/datasources/AWSDS" pool-name="MySqlDS">
+                    <connection-url>jdbc:mysql://localhost:3306/openapps</connection-url>
+                    <driver>com.mysql</driver>
+                    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+                    <pool>
+                        <min-pool-size>10</min-pool-size>
+                        <max-pool-size>100</max-pool-size>
+                        <prefill>true</prefill>
+                    </pool>
+                    <security>
+                        <user-name>root</user-name>
+                        <password>root</password>
+                    </security>
+                    <statement>
+                        <prepared-statement-cache-size>32</prepared-statement-cache-size>
+                        <share-prepared-statements>true</share-prepared-statements>
+                    </statement>
+                </datasource>
+                
+                ...
+                
+                <drivers>
+                    <driver name="com.mysql" module="com.mysql">
+                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                    </driver>
+                    
+                    ...
+                </drivers>
+            </datasources>
+        </subsystem>
+...
+
+    <interfaces>
+...
+
+        <interface name="public">
+            <any-ipv4-address/>
+        </interface>
+
+...
+        
+    </interfaces>
+
+
+</server>
