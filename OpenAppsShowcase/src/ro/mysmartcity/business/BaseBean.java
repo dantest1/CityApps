@@ -85,7 +85,6 @@ public class BaseBean {
 						} else if (field.isEnumConstant()) {
 							query.setParameter(field.getName(), param);
 						}
-
 					}
 				}
 			}
