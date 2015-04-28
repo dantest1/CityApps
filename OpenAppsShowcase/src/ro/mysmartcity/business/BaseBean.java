@@ -15,33 +15,44 @@ import ro.mysmartcity.bean.Base;
 import ro.mysmartcity.bean.IsQueryParam;
 
 /*
- * Base class for all managers 
+ * Base class for all managers
  */
 @Stateless
 public class BaseBean {
-
-	public static final String JNDI = "java:global/restEJB/business/BaseBean";
-
-	@PersistenceContext(unitName = "jpa")
-	private EntityManager manager;
 
 	enum PARAM {
 		limit, page
 	}
 
+	public static final String JNDI = "java:global/restEJB/business/BaseBean";
+
 	protected static final int QUERY_MAX_LIMIT = 100;
+
 	protected static final int QUERY_FIRST_RESULT = 0;
+	@PersistenceContext(unitName = "jpa")
+	private EntityManager manager;
+
+	protected Query buildQuery(final Class<?> entityClass, final Map<String, String> parameters, final EntityManager manager) {
+		String sql = getQuery(parameters, entityClass);
+		sql = "SELECT id " + sql;
+		final Query query = manager.createQuery(sql);
+
+		populateQueryParameters(entityClass, parameters, query);
+
+		query.setFirstResult(getQueryFirst(parameters));
+		query.setMaxResults(getQueryLimit(parameters));
+
+		return query;
+	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public List<Object> getAllIDs(final Class<?> objectClass, final Map<String, String> parameters) {
+	public void delete(final Class<?> objectClass, final Object id) {
 
-		String sql = getQuery(parameters, objectClass);
-		sql = "SELECT id " + sql;
-		Query query = buildQuery(parameters, manager, sql);
-		@SuppressWarnings("unchecked")
-		List<Object> ids = query.getResultList();
+		manager.remove(manager.find(objectClass, id));
+	}
 
-		return ids;
+	boolean exist(final Map<String, String> parameters, final String paramName) {
+		return parameters != null && parameters.get(paramName) != null;
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -51,30 +62,87 @@ public class BaseBean {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void delete(final Class<?> objectClass, final Object id) {
+	public List<Object> getAllIDs(final Class<?> entityClass, final Map<String, String> parameters) {
 
-		manager.remove(manager.find(objectClass, id));
+		final Query query = buildQuery(entityClass, parameters, manager);
+		@SuppressWarnings("unchecked")
+		final List<Object> ids = query.getResultList();
+
+		return ids;
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void update(final Base base) {
+	private void populateQueryParameters(final Class<?> entityClass, final Map<String, String> parameters, Query query) {
+		for (final Field field : entityClass.getDeclaredFields()) {
 
-		manager.merge(base);
+			if (field.isAnnotationPresent(IsQueryParam.class)) {
+
+				if (exist(parameters, field.getName())) {
+					final String param = parameters.get(field.getName());
+					if (isValidString(param)) {
+
+						if (field.getType().isAssignableFrom(String.class)) {
+							query.setParameter(field.getName(), param);
+						} else if (field.isEnumConstant()) {
+							query.setParameter(field.getName(), param);
+						}
+
+					}
+				}
+			}
+
+		}
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Base insert(final Base base) {
+	protected String getQuery(final Map<String, String> parameters, final Class<?> entityClass) {
 
-		manager.persist(base);
-		return base;
+		final StringBuffer query = new StringBuffer("FROM ");
+		query.append(entityClass.getSimpleName());
+
+		boolean isFirst = true;
+		for (final Field field : entityClass.getDeclaredFields()) {
+
+			if (field.isAnnotationPresent(IsQueryParam.class)) {
+
+				if (exist(parameters, field.getName())) {
+					final String param = parameters.get(field.getName());
+					if (isValidString(param)) {
+
+						if (isFirst) {
+							query.append(" WHERE ");
+							isFirst = false;
+						} else {
+							query.append(" AND ");
+						}
+
+						query.append(field.getName()).append(" LIKE ").append(":").append(field.getName());
+					}
+				}
+			}
+
+		}
+
+		return query.toString();
+	}
+
+	protected int getQueryFirst(final Map<String, String> parameters) {
+
+		if (exist(parameters, PARAM.page.name())) {
+			final String param = parameters.get(PARAM.page.name());
+			if (isValidInteger(param)) {
+				final Integer page = Integer.valueOf(param);
+				return page * getQueryLimit(parameters);
+			}
+		}
+
+		return QUERY_FIRST_RESULT;
 	}
 
 	protected int getQueryLimit(final Map<String, String> parameters) {
 
 		if (exist(parameters, PARAM.limit.name())) {
-			String param = parameters.get(PARAM.limit.name());
+			final String param = parameters.get(PARAM.limit.name());
 			if (isValidInteger(param)) {
-				Integer count = Integer.valueOf(param);
+				final Integer count = Integer.valueOf(param);
 				if (count <= 100) {
 					return count;
 				}
@@ -84,64 +152,18 @@ public class BaseBean {
 		return QUERY_MAX_LIMIT;
 	}
 
-	protected int getQueryFirst(final Map<String, String> parameters) {
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Base insert(final Base base) {
 
-		if (exist(parameters, PARAM.page.name())) {
-			String param = parameters.get(PARAM.page.name());
-			if (isValidInteger(param)) {
-				Integer page = Integer.valueOf(param);
-				return page * getQueryLimit(parameters);
-			}
-		}
-
-		return QUERY_FIRST_RESULT;
-	}
-
-	protected Query buildQuery(final Map<String, String> parameters, final EntityManager manager, final String sql) {
-		Query query = manager.createQuery(sql);
-		query.setFirstResult(getQueryFirst(parameters));
-		query.setMaxResults(getQueryLimit(parameters));
-
-		return query;
-	}
-
-	protected String getQuery(final Map<String, String> parameters, final Class<?> entityClass) {
-
-		String query = "FROM " + entityClass.getSimpleName();
-		boolean isFirst = true;
-		for (Field field : entityClass.getDeclaredFields()) {
-
-			if (field.isAnnotationPresent(IsQueryParam.class)) {
-
-				if (exist(parameters, field.getName())) {
-					String param = parameters.get(field.getName());
-					if (isValidString(param)) {
-
-						if (isFirst) {
-							query = query + " WHERE " + field.getName() + " LIKE '" + param + "'";
-							isFirst = false;
-						} else {
-							query = query + " AND " + field.getName() + " LIKE '" + param + "'";
-						}
-					}
-
-				}
-			}
-
-		}
-
-		return query;
-	}
-
-	boolean exist(final Map<String, String> parameters, final String paramName) {
-		return parameters != null && parameters.get(paramName) != null;
+		manager.persist(base);
+		return base;
 	}
 
 	boolean isValidInteger(final String number) {
 		try {
 			Integer.valueOf(number);
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return false;
 		}
 	}
@@ -154,6 +176,12 @@ public class BaseBean {
 
 		return false;
 
+	}
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void update(final Base base) {
+
+		manager.merge(base);
 	}
 
 }

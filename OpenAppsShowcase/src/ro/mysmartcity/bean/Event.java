@@ -29,6 +29,7 @@ public class Event extends Base {
 	private String agenda;
 	private String awards;
 
+	@IsQueryParam
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
 	private STATUS status = STATUS.INACTIVE;
