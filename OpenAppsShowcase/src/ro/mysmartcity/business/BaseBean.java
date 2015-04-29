@@ -120,6 +120,8 @@ public class BaseBean {
 
 		}
 
+		// TODO if exist field status, than add status = ACTIVE to query
+
 		return query.toString();
 	}
 
