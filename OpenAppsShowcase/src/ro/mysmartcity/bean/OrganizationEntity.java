@@ -5,15 +5,18 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "OrganizationEntity")
 public class OrganizationEntity extends Base {
 
 	@IsQueryParam
+	@NotNull
 	@Column(nullable = false)
 	private String organizationURL;
 	@IsQueryParam
+	@NotNull
 	@Column(nullable = false)
 	private String entityURL;
 

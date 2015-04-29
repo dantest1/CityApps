@@ -3,12 +3,14 @@ package ro.mysmartcity.bean;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Organization")
 public class Organization extends Base {
 
 	@IsQueryParam
+	@NotNull
 	@Column(length = 100)
 	private String name;
 	private String description;

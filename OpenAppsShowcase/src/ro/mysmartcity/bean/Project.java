@@ -5,15 +5,18 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Project")
 public class Project extends Base {
 
 	@IsQueryParam
+	@NotNull
 	private String name;
 
 	@Column(length = 1000)
+	@NotNull
 	private String description;
 
 	@IsQueryParam
@@ -47,6 +50,7 @@ public class Project extends Base {
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
+	@NotNull
 	private STATUS status = STATUS.INACTIVE;
 
 	public String getAward() {

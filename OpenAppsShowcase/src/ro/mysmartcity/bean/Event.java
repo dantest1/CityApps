@@ -7,16 +7,19 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Event")
 public class Event extends Base {
 
 	@IsQueryParam
+	@NotNull
 	@Column(nullable = false)
 	private String name;
 
 	@Column(length = 1000, nullable = false)
+	@NotNull
 	private String description;
 
 	private Date startDate;
@@ -30,6 +33,7 @@ public class Event extends Base {
 	private String awards;
 
 	@IsQueryParam
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
 	private STATUS status = STATUS.INACTIVE;
