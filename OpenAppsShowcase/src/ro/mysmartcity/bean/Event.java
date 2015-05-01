@@ -6,11 +6,15 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "Event")
+@Table(name = "Event", indexes = { @Index(name = "name_idx", columnList = "name", unique = true),
+		@Index(name = "startDate_idx", columnList = "startDate", unique = false),
+		@Index(name = "endDate_idx", columnList = "endDate", unique = false), @Index(name = "location_idx", columnList = "location", unique = false),
+		@Index(name = "status_idx", columnList = "status", unique = false) })
 public class Event extends Base {
 
 	@IsQueryParam
@@ -22,7 +26,9 @@ public class Event extends Base {
 	@NotNull
 	private String description;
 
+	@IsQueryParam
 	private Date startDate;
+	@IsQueryParam
 	private Date endDate;
 
 	@IsQueryParam
@@ -129,6 +135,12 @@ public class Event extends Base {
 
 	public void setStatus(STATUS status) {
 		this.status = status;
+	}
+
+	public static void main(String[] args) throws Exception {
+
+		System.out.println(Event.class.getDeclaredField("status"));
+
 	}
 
 }

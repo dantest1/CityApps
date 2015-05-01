@@ -8,7 +8,8 @@
 	<classpathentry kind="lib" path="lib/jboss-ejb3x.jar"/>
 	<classpathentry kind="lib" path="lib/javax.servlet.jar"/>
 	<classpathentry kind="lib" path="lib/jaxrs-api-2.2-beta-1.jar"/>
-	<classpathentry kind="lib" path="lib/ejb3-persistence.jar"/>
 	<classpathentry kind="lib" path="lib/validation-api-1.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="lib/javax.ws.rs-api-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

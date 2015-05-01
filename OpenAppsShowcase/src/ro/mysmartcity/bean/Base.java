@@ -1,5 +1,7 @@
 package ro.mysmartcity.bean;
 
+import java.text.SimpleDateFormat;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -7,6 +9,9 @@ import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class Base {
+
+	public static final SimpleDateFormat DATE_PATTERN = new SimpleDateFormat("dd.MM.yyyy");
+	public static final SimpleDateFormat DATE_TIME_PATTERN = new SimpleDateFormat("dd.MM.yyyy H:mm");
 
 	public enum LICENSE {
 		CC, FREE, COMMERCIAL, OTHER

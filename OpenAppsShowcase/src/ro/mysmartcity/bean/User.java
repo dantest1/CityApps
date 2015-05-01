@@ -2,24 +2,28 @@ package ro.mysmartcity.bean;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User", indexes = { @Index(name = "email_idx", columnList = "email", unique = true),
+		@Index(name = "firstname_idx", columnList = "firstname", unique = false),
+		@Index(name = "lastname_idx", columnList = "lastname", unique = false) })
 public class User extends Base {
 
 	@IsQueryParam
-	@Column(unique = true, length = 50)
-	private String gmail;
+	@NotNull
+	@Column(unique = true, length = 50, nullable = false)
+	private String email;
 
 	@IsQueryParam
-	@Column(length = 50)
+	@Column(length = 50, nullable = false)
 	@NotNull
 	private String firstname;
 
 	@IsQueryParam
-	@Column(length = 50)
+	@Column(length = 50, nullable = false)
 	@NotNull
 	private String lastname;
 
@@ -55,10 +59,6 @@ public class User extends Base {
 		return git;
 	}
 
-	public String getGmail() {
-		return gmail;
-	}
-
 	public String getLastname() {
 		return lastname;
 	}
@@ -91,10 +91,6 @@ public class User extends Base {
 		this.git = git;
 	}
 
-	public void setGmail(String gmail) {
-		this.gmail = gmail;
-	}
-
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
@@ -109,6 +105,14 @@ public class User extends Base {
 
 	public void setPlatformAdmin(boolean platformAdmin) {
 		this.platformAdmin = platformAdmin;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }

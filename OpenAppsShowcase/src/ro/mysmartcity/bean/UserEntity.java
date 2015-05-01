@@ -4,11 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "UserEntity")
+@Table(name = "UserEntity", indexes = { @Index(name = "userURL_idx", columnList = "userURL", unique = false),
+		@Index(name = "entityURL_idx", columnList = "entityURL", unique = false) })
 public class UserEntity extends Base {
 
 	@IsQueryParam

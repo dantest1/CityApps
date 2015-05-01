@@ -1,6 +1,7 @@
 package ro.mysmartcity.business;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,9 +15,6 @@ import javax.persistence.Query;
 import ro.mysmartcity.bean.Base;
 import ro.mysmartcity.bean.IsQueryParam;
 
-/*
- * Base class for all managers
- */
 @Stateless
 public class BaseBean {
 
@@ -27,8 +25,8 @@ public class BaseBean {
 	public static final String JNDI = "java:global/restEJB/business/BaseBean";
 
 	protected static final int QUERY_MAX_LIMIT = 100;
-
 	protected static final int QUERY_FIRST_RESULT = 0;
+
 	@PersistenceContext(unitName = "jpa")
 	private EntityManager manager;
 
@@ -36,7 +34,6 @@ public class BaseBean {
 		String sql = getQuery(parameters, entityClass);
 		sql = "SELECT id " + sql;
 		final Query query = manager.createQuery(sql);
-
 		populateQueryParameters(entityClass, parameters, query);
 
 		query.setFirstResult(getQueryFirst(parameters));
@@ -76,7 +73,23 @@ public class BaseBean {
 
 			if (field.isAnnotationPresent(IsQueryParam.class)) {
 
-				if (exist(parameters, field.getName())) {
+				if (field.getType().isAssignableFrom(Date.class)) {
+					if (field.getType().isAssignableFrom(Date.class)) {
+
+						String fieldName = field.getName() + "From";
+						Date dateFrom = getDateParameter(parameters, fieldName);
+						if (dateFrom != null) {
+							query.setParameter(fieldName, dateFrom);
+						}
+
+						fieldName = field.getName() + "To";
+						Date dateTo = getDateParameter(parameters, fieldName);
+						if (dateTo != null) {
+							query.setParameter(fieldName, dateTo);
+						}
+
+					}
+				} else if (exist(parameters, field.getName())) {
 					final String param = parameters.get(field.getName());
 					if (isValidString(param)) {
 
@@ -97,32 +110,68 @@ public class BaseBean {
 		final StringBuffer query = new StringBuffer("FROM ");
 		query.append(entityClass.getSimpleName());
 
-		boolean isFirst = true;
+		Boolean isFirst = true;
 		for (final Field field : entityClass.getDeclaredFields()) {
 
 			if (field.isAnnotationPresent(IsQueryParam.class)) {
 
-				if (exist(parameters, field.getName())) {
+				if (field.getType().isAssignableFrom(Date.class)) {
+
+					String fieldName = field.getName() + "From";
+					if (getDateParameter(parameters, fieldName) != null) {
+						isFirst = appendWhereAnd(isFirst, query);
+						query.append(field.getName()).append(" >= ").append(":").append(fieldName);
+					}
+
+					fieldName = field.getName() + "To";
+					if (getDateParameter(parameters, fieldName) != null) {
+						isFirst = appendWhereAnd(isFirst, query);
+						query.append(field.getName()).append(" <= ").append(":").append(fieldName);
+					}
+
+				} else if (exist(parameters, field.getName())) {
 					final String param = parameters.get(field.getName());
 					if (isValidString(param)) {
 
-						if (isFirst) {
-							query.append(" WHERE ");
-							isFirst = false;
-						} else {
-							query.append(" AND ");
-						}
-
+						isFirst = appendWhereAnd(isFirst, query);
 						query.append(field.getName()).append(" LIKE ").append(":").append(field.getName());
 					}
 				}
 			}
-
 		}
 
-		// TODO if exist field status, than add status = ACTIVE to query
+		// status must be active
+		try {
+			entityClass.getDeclaredField("status");
+			isFirst = appendWhereAnd(isFirst, query);
+			query.append("status='" + Base.STATUS.ACTIVE.name() + "'");
+		} catch (final Exception e) {
+			// eat it
+		}
 
 		return query.toString();
+	}
+
+	private Date getDateParameter(final Map<String, String> parameters, final String fieldName) {
+
+		try {
+			final String param = parameters.get(fieldName);
+
+			Date dateFrom = Base.DATE_PATTERN.parse(param);
+
+			if (dateFrom == null) {
+				dateFrom = Base.DATE_TIME_PATTERN.parse(param);
+			}
+			return dateFrom;
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
+
+	private boolean appendWhereAnd(boolean isFirst, final StringBuffer query) {
+		query.append(isFirst ? " WHERE " : " AND ");
+		return false;
 	}
 
 	protected int getQueryFirst(final Map<String, String> parameters) {

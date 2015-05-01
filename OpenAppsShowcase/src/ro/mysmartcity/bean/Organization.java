@@ -2,16 +2,17 @@ package ro.mysmartcity.bean;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "Organization")
+@Table(name = "Organization", indexes = { @Index(name = "name_idx", columnList = "name", unique = true) })
 public class Organization extends Base {
 
 	@IsQueryParam
 	@NotNull
-	@Column(length = 100)
+	@Column(length = 100, unique = true)
 	private String name;
 	private String description;
 

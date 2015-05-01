@@ -4,18 +4,25 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "Project")
+@Table(name = "Project", indexes = { @Index(name = "name_idx", columnList = "name", unique = false),
+		@Index(name = "eventURL_idx", columnList = "eventURL", unique = false),
+		@Index(name = "category_idx", columnList = "category", unique = false),
+		@Index(name = "technologies_idx", columnList = "technologies", unique = false),
+		@Index(name = "license_idx", columnList = "license", unique = false), @Index(name = "state_idx", columnList = "state", unique = false),
+		@Index(name = "status_idx", columnList = "status", unique = false) })
 public class Project extends Base {
 
 	@IsQueryParam
 	@NotNull
+	@Column(nullable = false)
 	private String name;
 
-	@Column(length = 1000)
+	@Column(length = 1000, nullable = false)
 	@NotNull
 	private String description;
 
@@ -44,13 +51,15 @@ public class Project extends Base {
 	private LICENSE license;
 
 	@IsQueryParam
-	@Column(length = 20)
+	@NotNull
+	@Column(length = 20, nullable = false)
 	private STATE state;
 	private String award;
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
 	@NotNull
+	@IsQueryParam
 	private STATUS status = STATUS.INACTIVE;
 
 	public String getAward() {
