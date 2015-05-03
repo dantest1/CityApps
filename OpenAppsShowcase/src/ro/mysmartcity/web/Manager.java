@@ -13,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 import ro.mysmartcity.bean.Base;
 import ro.mysmartcity.business.BaseBean;
@@ -22,7 +23,7 @@ public abstract class Manager {
 	protected abstract Class<?> getEntityClass();
 
 	@GET
-	@Produces(value = { "application/json" })
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> get(@Context HttpServletRequest request) throws Exception {
 
 		final List<Object> list = getBean(BaseBean.JNDI).getAllIDs(getEntityClass(), getMap(request));
@@ -37,7 +38,7 @@ public abstract class Manager {
 	}
 
 	@GET
-	@Produces(value = { "application/json" })
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/{id}")
 	public Base get(@PathParam("id") Long id) throws Exception {
 
@@ -55,6 +56,11 @@ public abstract class Manager {
 
 		getBean(BaseBean.JNDI).update(base);
 		return buildLoadURL(request, base.getId());
+	}
+
+	public void activate(final Class<?> entity, final Long id) throws Exception {
+
+		getBean(BaseBean.JNDI).activate(entity, id);
 	}
 
 	public String insert(@Context HttpServletRequest request, final Base base) throws Exception {

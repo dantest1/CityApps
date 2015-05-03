@@ -56,11 +56,19 @@ public class Project extends Base {
 	private STATE state;
 	private String award;
 
+	@IsQueryParam
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
-	@NotNull
-	@IsQueryParam
 	private STATUS status = STATUS.INACTIVE;
+
+	public STATUS getStatus() {
+		return status;
+	}
+
+	public void setStatus(STATUS status) {
+		this.status = status;
+	}
 
 	public String getAward() {
 		return award;
@@ -108,10 +116,6 @@ public class Project extends Base {
 
 	public STATE getState() {
 		return state;
-	}
-
-	public STATUS getStatus() {
-		return status;
 	}
 
 	public String getTechnologies() {
@@ -164,10 +168,6 @@ public class Project extends Base {
 
 	public void setState(STATE state) {
 		this.state = state;
-	}
-
-	public void setStatus(STATUS status) {
-		this.status = status;
 	}
 
 	public void setTechnologies(String technologies) {

@@ -4,6 +4,16 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-app_2_4.xsd"
 	version="2.4">
 
+
+    <context-param>
+        <param-name>resteasy.providers</param-name>
+        <param-value>ro.mysmartcity.web.JacksonConfig</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>resteasy.providers</param-name>
+        <param-value>ro.mysmartcity.web.DefaultExceptionHandler</param-value>
+    </context-param>
  
  	<filter>
 		<filter-name>CORSFilter</filter-name>
@@ -13,5 +23,7 @@
 		<filter-name>CORSFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+ 
+ 
  
 </web-app>

@@ -7,6 +7,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 import ro.mysmartcity.bean.OrganizationEntity;
 
@@ -19,13 +20,13 @@ public class OrganizationEntityManager extends Manager {
 	}
 
 	@PUT
-	@Consumes(value = { "application/json" })
+	@Consumes(MediaType.APPLICATION_JSON)
 	public String update(@Context HttpServletRequest request, final @Valid OrganizationEntity base) throws Exception {
 		return super.update(request, base);
 	}
 
 	@POST
-	@Consumes(value = { "application/json" })
+	@Consumes(MediaType.APPLICATION_JSON)
 	public String insert(@Context HttpServletRequest request, final @Valid OrganizationEntity base) throws Exception {
 		return super.insert(request, base);
 	}

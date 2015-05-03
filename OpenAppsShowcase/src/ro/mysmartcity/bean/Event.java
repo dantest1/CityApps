@@ -1,5 +1,6 @@
 package ro.mysmartcity.bean;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -38,14 +39,14 @@ public class Event extends Base {
 	private String agenda;
 	private String awards;
 
+	private String[] categories;
+	private String eventWebPage;
+
 	@IsQueryParam
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
 	private STATUS status = STATUS.INACTIVE;
-
-	private String[] categories;
-	private String eventWebPage;
 
 	public Event() {
 		super();
@@ -55,6 +56,14 @@ public class Event extends Base {
 		super();
 		this.name = name;
 		this.description = description;
+	}
+
+	public STATUS getStatus() {
+		return status;
+	}
+
+	public void setStatus(STATUS status) {
+		this.status = status;
 	}
 
 	public String getAgenda() {
@@ -93,10 +102,6 @@ public class Event extends Base {
 		return startDate;
 	}
 
-	public STATUS getStatus() {
-		return status;
-	}
-
 	public void setAgenda(String agenda) {
 		this.agenda = agenda;
 	}
@@ -133,14 +138,29 @@ public class Event extends Base {
 		this.startDate = startDate;
 	}
 
-	public void setStatus(STATUS status) {
-		this.status = status;
+	@Override
+	public String toString() {
+		return "Event [name=" + name + ", description=" + description + ", startDate=" + startDate + ", endDate=" + endDate + ", location="
+				+ location + ", agenda=" + agenda + ", awards=" + awards + ", categories=" + Arrays.toString(categories) + ", eventWebPage="
+				+ eventWebPage + ", status=" + status + "]";
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
+		try {
+			Event.class.getDeclaredField("status");
 
-		System.out.println(Event.class.getDeclaredField("status"));
+			Event e = new Event();
 
+			System.out.println(e);
+
+			Event.class.getDeclaredField("status").set(e, STATUS.ACTIVE);
+
+			System.out.println(e);
+		} catch (Exception e) {
+			// throw new
+			// NoSuchMethodException("Activate not supported on Class: " +
+			// entity.getName());
+			e.printStackTrace();
+		}
 	}
-
 }

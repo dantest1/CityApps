@@ -7,8 +7,10 @@
 	<classpathentry kind="lib" path="lib/jboss-ejb3-ext-api.jar"/>
 	<classpathentry kind="lib" path="lib/jboss-ejb3x.jar"/>
 	<classpathentry kind="lib" path="lib/javax.servlet.jar"/>
-	<classpathentry kind="lib" path="lib/jaxrs-api-2.2-beta-1.jar"/>
 	<classpathentry kind="lib" path="lib/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="lib/jaxrs-api-3.0.10.Final.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,6 +1,7 @@
 package ro.mysmartcity.business;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import ro.mysmartcity.bean.Base;
+import ro.mysmartcity.bean.Base.STATUS;
 import ro.mysmartcity.bean.IsQueryParam;
 
 @Stateless
@@ -140,6 +142,7 @@ public class BaseBean {
 			}
 		}
 
+		// TODO add this filter just of user is not platform admin
 		// status must be active
 		try {
 			entityClass.getDeclaredField("status");
@@ -157,11 +160,7 @@ public class BaseBean {
 		try {
 			final String param = parameters.get(fieldName);
 
-			Date dateFrom = Base.DATE_PATTERN.parse(param);
-
-			if (dateFrom == null) {
-				dateFrom = Base.DATE_TIME_PATTERN.parse(param);
-			}
+			Date dateFrom = Base.DATE_TIME_PATTERN.parse(param);
 			return dateFrom;
 		} catch (Exception e) {
 			return null;
@@ -234,4 +233,22 @@ public class BaseBean {
 		manager.merge(base);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void activate(final Class<?> entity, final Long id) throws NoSuchMethodException {
+
+		Method m = entity.getDeclaredMethod("setStatus", STATUS.class);
+		Base base = get(entity, id);
+
+		if (base == null) {
+			throw new IllegalArgumentException("Entity with id: " + id + " doesn't exist! Activate is not possible.");
+		}
+
+		try {
+			m.invoke(base, STATUS.ACTIVE);
+		} catch (Exception e) {
+			throw new NoSuchMethodException("Activate not supported on Class: " + entity.getName());
+		}
+		update(base);
+
+	}
 }
