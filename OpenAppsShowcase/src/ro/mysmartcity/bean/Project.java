@@ -8,6 +8,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+@Description(description = "Project (often a software project, but not necessary) details")
 @Entity
 @Table(name = "Project", indexes = { @Index(name = "name_idx", columnList = "name", unique = false),
 		@Index(name = "eventURL_idx", columnList = "eventURL", unique = false),
@@ -17,44 +18,64 @@ import javax.validation.constraints.NotNull;
 		@Index(name = "status_idx", columnList = "status", unique = false) })
 public class Project extends Base {
 
+	@Description(description = "The name of the project")
 	@IsQueryParam
 	@NotNull
 	@Column(nullable = false)
 	private String name;
 
+	@Description(description = "Project description")
 	@Column(length = 1000, nullable = false)
 	@NotNull
 	private String description;
 
+	@Description(description = "Event where the project was developed")
 	@IsQueryParam
 	@Column(length = 100)
 	private String eventURL;
 
+	@Description(description = "Project category in the event")
 	@IsQueryParam
 	@Column(length = 50)
 	private String category;
+
+	@Description(description = "Who are the beneficiaries of the project")
 	@Column(length = 1000)
 	private String beneficiaries;
+
+	@Description(description = "Open Data Series used in the project")
 	private String openDataSeries;
+
+	@Description(description = "Project functionalities")
 	@Column(length = 1000)
 	private String functionalities;
 
+	@Description(description = "Technologies used in the project")
 	@IsQueryParam
 	private String technologies;
+
+	@Description(description = "Online url where the project is available")
 	@Column(length = 100)
 	private String onlineURL;
+
+	@Description(description = "Github url of the project")
 	@Column(length = 100)
 	private String gitURL;
 
+	@Description(description = "Project license")
 	@IsQueryParam
 	@Column(length = 50)
 	private LICENSE license;
 
+	@Description(description = "Project state")
 	@IsQueryParam
 	@Column(length = 20, nullable = false)
 	private STATE state;
+
+	@Description(description = "Project awards")
 	private String award;
 
+	@Description(description = "Project entity status. By default INACTIVE, till it will be activated by platform administrator")
 	@IsQueryParam
 	@NotNull
 	@Enumerated(EnumType.STRING)
