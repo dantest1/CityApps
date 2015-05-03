@@ -1,14 +1,22 @@
 package ro.mysmartcity.web;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -16,11 +24,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import ro.mysmartcity.bean.Base;
+import ro.mysmartcity.bean.IsQueryParam;
 import ro.mysmartcity.business.BaseBean;
 
-public abstract class Manager {
+public abstract class Manager<T extends Base> {
 
-	protected abstract Class<?> getEntityClass();
+	protected abstract Class<? extends Base> getEntityClass();
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -45,6 +54,69 @@ public abstract class Manager {
 		return getBean(BaseBean.JNDI).get(getEntityClass(), id);
 	}
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/help")
+	public List<Map<String, Object>> help(@Context HttpServletRequest request) {
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+		list.add(getMethodMap("get urls of first " + BaseBean.QUERY_MAX_LIMIT
+				+ " entities. Accepted query parameters are: 'limit', 'page' and all entity fields on which filter is accepted.", "GET", request
+				.getRequestURL().toString().replace("/help", ""), false));
+		list.add(getMethodMap("get entity with specified id", "GET", request.getRequestURL().toString().replace("/help", "") + "/{id}", false));
+		list.add(getMethodMap("delete entity with specified id", "DELETE", request.getRequestURL().toString().replace("/help", "") + "/{id}", true));
+		list.add(getMethodMap("add new entity", "POST", request.getRequestURL().toString().replace("/help", ""), true));
+		list.add(getMethodMap("update existing entity", "PUT", request.getRequestURL().toString().replace("/help", ""), true));
+
+		if (Base.hasActivate(getEntityClass())) {
+			list.add(getMethodMap("activate an existing entity", "PUT", request.getRequestURL().toString().replace("/help", "/activate/{id}"), true));
+		}
+
+		List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+
+		for (final Field field : getEntityClass().getDeclaredFields()) {
+
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", field.getName());
+			map.put("type", field.getType().getSimpleName());
+			if (field.isAnnotationPresent(IsQueryParam.class)) {
+				map.put("filter accepted", true);
+				if (field.getType().isAssignableFrom(Date.class)) {
+					map.put("FROM filter parameter", field.getName() + "From");
+					map.put("TO filter Parameter", field.getName() + "To");
+					map.put("dateTimePattern", Base.DATE_TIME_PATTERN);
+				}
+			}
+
+			if (field.isAnnotationPresent(NotNull.class)) {
+				map.put("isMandatory", true);
+			}
+
+			fields.add(map);
+		}
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("entityName", getEntityClass().getSimpleName());
+		map.put("entityFields", fields);
+		map.put("STATUS options: ", Arrays.asList(Base.STATUS.values()));
+		map.put("LICENSE options: ", Arrays.asList(Base.LICENSE.values()));
+		map.put("STATE options: ", Arrays.asList(Base.STATE.values()));
+		list.add(map);
+
+		return list;
+	}
+
+	private Map<String, Object> getMethodMap(final String description, final String method, final String url, final boolean isSecured) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("url", url);
+		map.put("description", description);
+		map.put("method", method);
+		map.put("isSecured", isSecured);
+
+		return map;
+	}
+
 	@DELETE
 	@Path("/{id}")
 	public void delete(@PathParam("id") Long id) throws Exception {
@@ -52,19 +124,22 @@ public abstract class Manager {
 		getBean(BaseBean.JNDI).delete(getEntityClass(), id);
 	}
 
-	public String update(@Context HttpServletRequest request, final Base base) throws Exception {
-
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String update(@Context HttpServletRequest request, final @Valid T base) throws Exception {
 		getBean(BaseBean.JNDI).update(base);
 		return buildLoadURL(request, base.getId());
 	}
 
-	public void activate(final Class<?> entity, final Long id) throws Exception {
-
-		getBean(BaseBean.JNDI).activate(entity, id);
+	@PUT
+	@Path("/activate/{id}")
+	public void activate(@PathParam("id") Long id) throws Exception {
+		getBean(BaseBean.JNDI).activate(getEntityClass(), id);
 	}
 
-	public String insert(@Context HttpServletRequest request, final Base base) throws Exception {
-
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String insert(@Context HttpServletRequest request, final @Valid T base) throws Exception {
 		final Base b = getBean(BaseBean.JNDI).insert(base);
 		return buildLoadURL(request, b.getId());
 	}

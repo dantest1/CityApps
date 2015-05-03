@@ -13,7 +13,8 @@ import javax.persistence.PreUpdate;
 @MappedSuperclass
 public class Base {
 
-	public static final SimpleDateFormat DATE_TIME_PATTERN = new SimpleDateFormat("dd.MM.yyyy H:mm");
+	public static final String DATE_TIME_PATTERN = "dd.MM.yyyy H:mm";
+	public static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat(DATE_TIME_PATTERN);
 
 	public enum LICENSE {
 		FREE, COMMERCIAL, OTHER
@@ -24,7 +25,7 @@ public class Base {
 	}
 
 	public enum STATE {
-		PROPOSAL, STARTED, ALPHA, BETA, FINAL
+		PROPOSED, STARTED, ALPHA, BETA, FINAL
 	}
 
 	public enum STATUS {
@@ -62,6 +63,16 @@ public class Base {
 
 	public Date getUpdated() {
 		return updated;
+	}
+
+	public static boolean hasActivate(final Class<? extends Base> entityClass) {
+
+		try {
+			entityClass.getDeclaredMethod("setStatus", STATUS.class);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

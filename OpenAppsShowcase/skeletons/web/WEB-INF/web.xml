@@ -7,13 +7,9 @@
 
     <context-param>
         <param-name>resteasy.providers</param-name>
-        <param-value>ro.mysmartcity.web.JacksonConfig</param-value>
+        <param-value>ro.mysmartcity.web.JacksonConfig, ro.mysmartcity.web.DefaultExceptionHandler</param-value>
     </context-param>
 
-    <context-param>
-        <param-name>resteasy.providers</param-name>
-        <param-value>ro.mysmartcity.web.DefaultExceptionHandler</param-value>
-    </context-param>
  
  	<filter>
 		<filter-name>CORSFilter</filter-name>

@@ -25,7 +25,9 @@ public class MyApplication extends Application {
 		classes.add(ro.mysmartcity.web.OrganizationEntityManager.class);
 
 		for (Class<?> c : classes) {
-			urls.add(c.getAnnotation(Path.class).value());
+			if (!c.equals(ro.mysmartcity.web.DefaultManager.class)) {
+				urls.add(c.getAnnotation(Path.class).value() + "/help");
+			}
 		}
 	}
 

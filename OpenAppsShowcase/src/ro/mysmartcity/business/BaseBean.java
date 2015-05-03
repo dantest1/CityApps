@@ -26,7 +26,7 @@ public class BaseBean {
 
 	public static final String JNDI = "java:global/restEJB/business/BaseBean";
 
-	protected static final int QUERY_MAX_LIMIT = 100;
+	public static final int QUERY_MAX_LIMIT = 100;
 	protected static final int QUERY_FIRST_RESULT = 0;
 
 	@PersistenceContext(unitName = "jpa")
@@ -160,7 +160,7 @@ public class BaseBean {
 		try {
 			final String param = parameters.get(fieldName);
 
-			Date dateFrom = Base.DATE_TIME_PATTERN.parse(param);
+			Date dateFrom = Base.DATE_TIME_FORMAT.parse(param);
 			return dateFrom;
 		} catch (Exception e) {
 			return null;
@@ -236,19 +236,21 @@ public class BaseBean {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void activate(final Class<?> entity, final Long id) throws NoSuchMethodException {
 
-		Method m = entity.getDeclaredMethod("setStatus", STATUS.class);
-		Base base = get(entity, id);
-
-		if (base == null) {
-			throw new IllegalArgumentException("Entity with id: " + id + " doesn't exist! Activate is not possible.");
-		}
-
 		try {
+			Method m = entity.getDeclaredMethod("setStatus", STATUS.class);
+			Base base = get(entity, id);
+
+			if (base == null) {
+				throw new IllegalArgumentException("Entity with id: " + id + " doesn't exist! Activate is not possible.");
+			}
+
 			m.invoke(base, STATUS.ACTIVE);
+			update(base);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Entity with id: " + id + " doesn't exist! Activate is not possible.");
 		} catch (Exception e) {
 			throw new NoSuchMethodException("Activate not supported on Class: " + entity.getName());
 		}
-		update(base);
 
 	}
 }

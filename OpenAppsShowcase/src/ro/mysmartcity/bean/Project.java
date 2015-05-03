@@ -51,7 +51,6 @@ public class Project extends Base {
 	private LICENSE license;
 
 	@IsQueryParam
-	@NotNull
 	@Column(length = 20, nullable = false)
 	private STATE state;
 	private String award;

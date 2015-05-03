@@ -1,40 +1,16 @@
 package ro.mysmartcity.web;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 
+import ro.mysmartcity.bean.Base;
 import ro.mysmartcity.bean.Project;
 
 @Path("/project")
-public class ProjectManager extends Manager {
+public class ProjectManager extends Manager<Project> {
 
 	@Override
-	protected Class<?> getEntityClass() {
+	protected Class<? extends Base> getEntityClass() {
 		return Project.class;
 	}
 
-	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String update(@Context HttpServletRequest request, final @Valid Project base) throws Exception {
-		return super.update(request, base);
-	}
-
-	@PUT
-	@Path("/activate/{id}")
-	public void activate(@PathParam("id") Long id) throws Exception {
-		super.activate(Project.class, id);
-	}
-
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String insert(@Context HttpServletRequest request, final @Valid Project base) throws Exception {
-		return super.insert(request, base);
-	}
 }

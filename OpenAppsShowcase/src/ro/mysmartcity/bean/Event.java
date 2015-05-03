@@ -43,7 +43,6 @@ public class Event extends Base {
 	private String eventWebPage;
 
 	@IsQueryParam
-	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
 	private STATUS status = STATUS.INACTIVE;

@@ -18,7 +18,7 @@ public class JacksonConfig implements ContextResolver<ObjectMapper> {
 
 	public JacksonConfig() throws Exception {
 		objectMapper = new ObjectMapper();
-		objectMapper.setDateFormat(Base.DATE_TIME_PATTERN);
+		objectMapper.setDateFormat(Base.DATE_TIME_FORMAT);
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 	}
 
