@@ -1,6 +1,5 @@
 package ro.mysmartcity.bean;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -11,37 +10,55 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+@EntityDescription(description = "Event entity contains all information about the organized event (e.g. hackathon)")
 @Entity
 @Table(name = "Event", indexes = { @Index(name = "name_idx", columnList = "name", unique = true),
 		@Index(name = "startDate_idx", columnList = "startDate", unique = false),
-		@Index(name = "endDate_idx", columnList = "endDate", unique = false), @Index(name = "location_idx", columnList = "location", unique = false),
+		@Index(name = "endDate_idx", columnList = "endDate", unique = false), @Index(name = "city_idx", columnList = "city", unique = false),
 		@Index(name = "status_idx", columnList = "status", unique = false) })
 public class Event extends Base {
 
 	@IsQueryParam
+	@FieldDescription(description = "Name of the organized event. Should be unique in the entire platform. Include also the year, for periodic events, in order to differentiate them")
 	@NotNull
 	@Column(nullable = false)
 	private String name;
 
+	@FieldDescription(description = "Event description")
 	@Column(length = 1000, nullable = false)
 	@NotNull
 	private String description;
 
+	@FieldDescription(description = "Event starte date, including time")
 	@IsQueryParam
 	private Date startDate;
+
+	@FieldDescription(description = "Event end/finish date, including time")
 	@IsQueryParam
 	private Date endDate;
 
+	@FieldDescription(description = "City where the event is organized")
+	@IsQueryParam
+	private String city;
+
+	@FieldDescription(description = "Address/location where the event is organized")
 	@IsQueryParam
 	private String location;
 
+	@FieldDescription(description = "Detailed agenda")
 	@Column(length = 1000)
 	private String agenda;
+
+	@FieldDescription(description = "Event awards - first 3 places")
 	private String awards;
 
+	@FieldDescription(description = "Main categories of event. E.g. Web, Smart City, Mobile, Hardware ...")
 	private String[] categories;
+
+	@FieldDescription(description = "Web page of the event")
 	private String eventWebPage;
 
+	@FieldDescription(description = "Status of the entity, which is INACTIVE, by default, till its activation")
 	@IsQueryParam
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
@@ -89,10 +106,6 @@ public class Event extends Base {
 		return eventWebPage;
 	}
 
-	public String getLocation() {
-		return location;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -125,8 +138,12 @@ public class Event extends Base {
 		this.eventWebPage = eventWebPage;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	public void setName(String name) {
@@ -135,13 +152,6 @@ public class Event extends Base {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
-	}
-
-	@Override
-	public String toString() {
-		return "Event [name=" + name + ", description=" + description + ", startDate=" + startDate + ", endDate=" + endDate + ", location="
-				+ location + ", agenda=" + agenda + ", awards=" + awards + ", categories=" + Arrays.toString(categories) + ", eventWebPage="
-				+ eventWebPage + ", status=" + status + "]";
 	}
 
 	public static void main(String[] args) {
