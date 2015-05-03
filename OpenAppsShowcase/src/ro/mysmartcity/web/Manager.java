@@ -24,8 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import ro.mysmartcity.bean.Base;
-import ro.mysmartcity.bean.EntityDescription;
-import ro.mysmartcity.bean.FieldDescription;
+import ro.mysmartcity.bean.Description;
 import ro.mysmartcity.bean.IsQueryParam;
 import ro.mysmartcity.business.BaseBean;
 
@@ -94,15 +93,15 @@ public abstract class Manager<T extends Base> {
 			if (field.isAnnotationPresent(NotNull.class)) {
 				map.put("isMandatory", true);
 			}
-			if (field.isAnnotationPresent(FieldDescription.class)) {
-				map.put("description", field.getAnnotation(FieldDescription.class).description());
+			if (field.isAnnotationPresent(Description.class)) {
+				map.put("description", field.getAnnotation(Description.class).description());
 			}
 			fields.add(map);
 		}
 
 		Map<String, Object> map = new HashMap<String, Object>();
-		if (getEntityClass().isAnnotationPresent(EntityDescription.class)) {
-			map.put("entityDescription", getEntityClass().getAnnotation(EntityDescription.class).description());
+		if (getEntityClass().isAnnotationPresent(Description.class)) {
+			map.put("entityDescription", getEntityClass().getAnnotation(Description.class).description());
 		}
 		map.put("entityName", getEntityClass().getSimpleName());
 		map.put("entityFields", fields);

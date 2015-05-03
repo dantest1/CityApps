@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface EntityDescription {
+@Target(value = { ElementType.TYPE, ElementType.FIELD })
+public @interface Description {
 
 	String description() default "N/A";
 }
