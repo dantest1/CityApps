@@ -55,6 +55,7 @@
 			<fileset dir="${build.classes.dir}">
 				<include name="**/business/**/*.class" />
 				<include name="**/bean**/*.class" />
+				<include name="**/util**/*.class" />
 			</fileset>
 			<fileset dir="${skeleton.ejb.dir}/">
 				<include name="**/*.xml" />

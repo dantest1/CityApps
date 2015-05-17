@@ -16,12 +16,13 @@ import javax.persistence.Query;
 import ro.mysmartcity.bean.Base;
 import ro.mysmartcity.bean.Base.STATUS;
 import ro.mysmartcity.bean.IsQueryParam;
+import ro.mysmartcity.util.StringHelper;
 
 @Stateless
 public class BaseBean {
 
 	enum PARAM {
-		limit, page
+		limit, page, sortBy, sortOrder
 	}
 
 	public static final String JNDI = "java:global/restEJB/business/BaseBean";
@@ -32,9 +33,12 @@ public class BaseBean {
 	@PersistenceContext(unitName = "jpa")
 	private EntityManager manager;
 
-	protected Query buildQuery(final Class<?> entityClass, final Map<String, String> parameters, final EntityManager manager) {
+	protected Query buildQuery(final Class<?> entityClass, final Map<String, String> parameters, final String prefix) {
 		String sql = getQuery(parameters, entityClass);
-		sql = "SELECT id " + sql;
+
+		if (StringHelper.isValid(prefix)) {
+			sql = prefix + sql;
+		}
 		final Query query = manager.createQuery(sql);
 		populateQueryParameters(entityClass, parameters, query);
 
@@ -60,14 +64,17 @@ public class BaseBean {
 		return (Base) manager.find(objectClass, id);
 	}
 
+	@SuppressWarnings("unchecked")
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public List<Object> getAllIDs(final Class<?> entityClass, final Map<String, String> parameters) {
+	public List<Object> getAllIDs(final Class<? extends Base> entityClass, final Map<String, String> parameters) {
 
-		final Query query = buildQuery(entityClass, parameters, manager);
-		@SuppressWarnings("unchecked")
-		final List<Object> ids = query.getResultList();
+		return buildQuery(entityClass, parameters, "SELECT id ").getResultList();
+	}
 
-		return ids;
+	@SuppressWarnings("unchecked")
+	public List<? extends Base> getAll(final Class<? extends Base> entityClass, final Map<String, String> parameters) {
+
+		return buildQuery(entityClass, parameters, null).getResultList();
 	}
 
 	private void populateQueryParameters(final Class<?> entityClass, final Map<String, String> parameters, Query query) {
@@ -142,7 +149,7 @@ public class BaseBean {
 			}
 		}
 
-		// TODO add this filter just of user is not platform admin
+		// TODO add this filter just when user is not platform admin
 		// status must be active
 		try {
 			entityClass.getDeclaredField("status");
@@ -152,6 +159,18 @@ public class BaseBean {
 			// eat it
 		}
 
+		if (parameters.containsKey(PARAM.sortBy.name())) {
+			query.append(" ORDER BY ").append(parameters.get(PARAM.sortBy.name())); //TODO accept just filterable fields for performance reasons
+
+			if (parameters.containsKey(PARAM.sortOrder.name())) {
+				if ("DESC".equals(parameters.get(PARAM.sortOrder.name()).toUpperCase())) {
+					query.append(" DESC");
+				} else {
+					query.append(" ASC");
+				}
+
+			}
+		}
 		return query.toString();
 	}
 

@@ -34,7 +34,8 @@ public abstract class Manager<T extends Base> {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> get(@Context HttpServletRequest request) throws Exception {
+	@Path("/url")
+	public List<String> getIDs(@Context HttpServletRequest request) throws Exception {
 
 		final List<Object> list = getBean(BaseBean.JNDI).getAllIDs(getEntityClass(), getMap(request));
 		final List<String> urls = new ArrayList<String>();
@@ -45,6 +46,13 @@ public abstract class Manager<T extends Base> {
 		}
 
 		return urls;
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<?> getAll(@Context HttpServletRequest request) throws Exception {
+
+		return getBean(BaseBean.JNDI).getAll(getEntityClass(), getMap(request));
 	}
 
 	@GET
@@ -62,9 +70,14 @@ public abstract class Manager<T extends Base> {
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-		list.add(getMethodMap("get urls of first " + BaseBean.QUERY_MAX_LIMIT
-				+ " entities. Accepted query parameters are: 'limit', 'page' and all entity fields on which filter is accepted.", "GET", request
-				.getRequestURL().toString().replace("/help", ""), false));
+		String getDescription = BaseBean.QUERY_MAX_LIMIT
+				+ " entities. Accepted query parameters are: 'limit' (number of returned entities, not more than "
+				+ BaseBean.QUERY_MAX_LIMIT
+				+ "), 'page' (pagination), 'sortBy' (sort by specified field, which must be declared as filerable) and 'sortOrder' (ASC or DESC) and all entity fields on which filter is accepted.";
+
+		list.add(getMethodMap("get urls of first " + getDescription, "GET", request.getRequestURL().toString().replace("/help", "") + "/url", false));
+		list.add(getMethodMap("get first " + getDescription, "GET", request.getRequestURL().toString().replace("/help", ""), false));
+
 		list.add(getMethodMap("get entity with specified id", "GET", request.getRequestURL().toString().replace("/help", "") + "/{id}", false));
 		list.add(getMethodMap("delete entity with specified id", "DELETE", request.getRequestURL().toString().replace("/help", "") + "/{id}", true));
 		list.add(getMethodMap("add new entity", "POST", request.getRequestURL().toString().replace("/help", ""), true));
@@ -82,7 +95,7 @@ public abstract class Manager<T extends Base> {
 			map.put("name", field.getName());
 			map.put("type", field.getType().getSimpleName());
 			if (field.isAnnotationPresent(IsQueryParam.class)) {
-				map.put("filter accepted", true);
+				map.put("filterable", true);
 				if (field.getType().isAssignableFrom(Date.class)) {
 					map.put("FROM filter parameter", field.getName() + "From");
 					map.put("TO filter Parameter", field.getName() + "To");
