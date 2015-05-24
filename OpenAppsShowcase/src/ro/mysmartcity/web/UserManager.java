@@ -28,7 +28,7 @@ public class UserManager extends Manager<User> {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path(GET_BY_EMAIL)
-	public String getByEmail(@Context HttpServletRequest request, @PathParam("email") String email) throws Exception {
+	public String getByEmail(@PathParam("email") String email) throws Exception {
 
 		final javax.naming.Context c = new javax.naming.InitialContext();
 		UserBean ub = (UserBean) c.lookup(UserBean.JNDI);

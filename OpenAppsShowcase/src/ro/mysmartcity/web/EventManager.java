@@ -28,7 +28,7 @@ public class EventManager extends Manager<Event> {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path(GET_BY_NAME)
-	public String getByEmail(@Context HttpServletRequest request, @PathParam("name") String name) throws Exception {
+	public String getByEmail(@PathParam("name") String name) throws Exception {
 
 		final javax.naming.Context c = new javax.naming.InitialContext();
 		EventBean ub = (EventBean) c.lookup(EventBean.JNDI);

@@ -154,6 +154,14 @@ public class Event extends Base {
 		this.startDate = startDate;
 	}
 
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
 	public static void main(String[] args) {
 		try {
 			Event.class.getDeclaredField("status");
