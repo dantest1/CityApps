@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+@SuppressWarnings("rawtypes")
 @Path("/")
 public class DefaultManager extends Manager {
 
@@ -17,10 +18,14 @@ public class DefaultManager extends Manager {
 	public List<String> urls(@Context HttpServletRequest request) throws Exception {
 
 		List<String> urls = new ArrayList<String>();
-		String url = request.getRequestURL().toString();
+		// String url = request.getRequestURL().toString();
 
 		for (String path : MyApplication.urls) {
-			urls.add(buildLoadURL(url, path));
+			// urls.add(buildLoadURL(url, path));
+
+			System.out.println(path);
+			System.out.println(buildLoadURL(path));
+			urls.add(buildLoadURL(path));
 		}
 
 		return urls;

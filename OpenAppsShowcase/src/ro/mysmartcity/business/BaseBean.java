@@ -51,21 +51,22 @@ public class BaseBean {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void delete(final Class<?> objectClass, final Object id) {
 
-		manager.remove(manager.find(objectClass, id));
+		Object o = manager.find(objectClass, id);
+		if (o != null) {
+			manager.remove(o);
+		}
 	}
 
 	boolean exist(final Map<String, String> parameters, final String paramName) {
 		return parameters != null && parameters.get(paramName) != null;
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public Base get(final Class<?> objectClass, final Object id) {
 
 		return (Base) manager.find(objectClass, id);
 	}
 
 	@SuppressWarnings("unchecked")
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public List<Object> getAllIDs(final Class<? extends Base> entityClass, final Map<String, String> parameters) {
 
 		return buildQuery(entityClass, parameters, "SELECT id ").getResultList();
@@ -160,7 +161,7 @@ public class BaseBean {
 		}
 
 		if (parameters.containsKey(PARAM.sortBy.name())) {
-			query.append(" ORDER BY ").append(parameters.get(PARAM.sortBy.name())); //TODO accept just filterable fields for performance reasons
+			query.append(" ORDER BY ").append(parameters.get(PARAM.sortBy.name())); // TODO accept just filterable fields for performance reasons
 
 			if (parameters.containsKey(PARAM.sortOrder.name())) {
 				if ("DESC".equals(parameters.get(PARAM.sortOrder.name()).toUpperCase())) {

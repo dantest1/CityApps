@@ -8,8 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "User", indexes = { @Index(name = "email_idx", columnList = "email", unique = true),
-		@Index(name = "firstname_idx", columnList = "firstname", unique = false),
-		@Index(name = "lastname_idx", columnList = "lastname", unique = false) })
+		@Index(name = "name_idx", columnList = "name", unique = false) })
 public class User extends Base {
 
 	@IsQueryParam
@@ -20,12 +19,7 @@ public class User extends Base {
 	@IsQueryParam
 	@Column(length = 50, nullable = false)
 	@NotNull
-	private String firstname;
-
-	@IsQueryParam
-	@Column(length = 50, nullable = false)
-	@NotNull
-	private String lastname;
+	private String name;
 
 	private String description;
 
@@ -41,8 +35,6 @@ public class User extends Base {
 	@Column(length = 100)
 	private String git;
 
-	private boolean platformAdmin;
-
 	public String getDescription() {
 		return description;
 	}
@@ -51,16 +43,8 @@ public class User extends Base {
 		return facebook;
 	}
 
-	public String getFirstname() {
-		return firstname;
-	}
-
 	public String getGit() {
 		return git;
-	}
-
-	public String getLastname() {
-		return lastname;
 	}
 
 	public String getLinkedin() {
@@ -71,10 +55,6 @@ public class User extends Base {
 		return phone;
 	}
 
-	public boolean isPlatformAdmin() {
-		return platformAdmin;
-	}
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -83,16 +63,16 @@ public class User extends Base {
 		this.facebook = facebook;
 	}
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-
 	public void setGit(String git) {
 		this.git = git;
 	}
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setLinkedin(String linkedin) {
@@ -103,16 +83,18 @@ public class User extends Base {
 		this.phone = phone;
 	}
 
-	public void setPlatformAdmin(boolean platformAdmin) {
-		this.platformAdmin = platformAdmin;
-	}
-
 	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	@Override
+	public String toString() {
+		return "User [email=" + email + ", name=" + name + ", description=" + description + ", phone=" + phone + ", facebook=" + facebook
+				+ ", linkedin=" + linkedin + ", git=" + git + "]";
 	}
 
 }

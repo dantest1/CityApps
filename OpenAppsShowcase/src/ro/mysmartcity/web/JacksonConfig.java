@@ -1,5 +1,7 @@
 package ro.mysmartcity.web;
 
+import java.util.TimeZone;
+
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -19,6 +21,7 @@ public class JacksonConfig implements ContextResolver<ObjectMapper> {
 	public JacksonConfig() throws Exception {
 		objectMapper = new ObjectMapper();
 		objectMapper.setDateFormat(Base.DATE_TIME_FORMAT);
+		objectMapper.setTimeZone(TimeZone.getTimeZone("Europe/Bucharest"));
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 	}
 

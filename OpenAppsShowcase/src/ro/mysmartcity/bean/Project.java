@@ -31,7 +31,6 @@ public class Project extends Base {
 
 	@Description(description = "Event where the project was developed")
 	@IsQueryParam
-	@Column(length = 100)
 	private String eventURL;
 
 	@Description(description = "Project category in the event")
@@ -63,11 +62,13 @@ public class Project extends Base {
 	private String gitURL;
 
 	@Description(description = "Project license")
+	@Enumerated(EnumType.STRING)
 	@IsQueryParam
 	@Column(length = 50)
 	private LICENSE license;
 
 	@Description(description = "Project state")
+	@Enumerated(EnumType.STRING)
 	@IsQueryParam
 	@Column(length = 20, nullable = false)
 	private STATE state;
@@ -104,10 +105,6 @@ public class Project extends Base {
 
 	public String getDescription() {
 		return description;
-	}
-
-	public String getEventURL() {
-		return eventURL;
 	}
 
 	public String getFunctionalities() {
@@ -158,10 +155,6 @@ public class Project extends Base {
 		this.description = description;
 	}
 
-	public void setEventURL(String eventURL) {
-		this.eventURL = eventURL;
-	}
-
 	public void setFunctionalities(String functionalities) {
 		this.functionalities = functionalities;
 	}
@@ -192,6 +185,22 @@ public class Project extends Base {
 
 	public void setTechnologies(String technologies) {
 		this.technologies = technologies;
+	}
+
+	public String getEventURL() {
+		return eventURL;
+	}
+
+	public void setEventURL(String eventURL) {
+		this.eventURL = eventURL;
+	}
+
+	@Override
+	public String toString() {
+		return "Project [name=" + name + ", description=" + description + ", eventURL=" + eventURL + ", category=" + category + ", beneficiaries="
+				+ beneficiaries + ", openDataSeries=" + openDataSeries + ", functionalities=" + functionalities + ", technologies=" + technologies
+				+ ", onlineURL=" + onlineURL + ", gitURL=" + gitURL + ", license=" + license + ", state=" + state + ", award=" + award + ", status="
+				+ status + "]";
 	}
 
 }

@@ -30,6 +30,8 @@ import ro.mysmartcity.business.BaseBean;
 
 public abstract class Manager<T extends Base> {
 
+	final static String SERVER_URL = "http://ec2-52-28-69-136.eu-central-1.compute.amazonaws.com";
+
 	protected abstract Class<? extends Base> getEntityClass();
 
 	@GET
@@ -39,10 +41,9 @@ public abstract class Manager<T extends Base> {
 
 		final List<Object> list = getBean(BaseBean.JNDI).getAllIDs(getEntityClass(), getMap(request));
 		final List<String> urls = new ArrayList<String>();
-		final String url = request.getRequestURL().toString();
 
 		for (final Object id : list) {
-			urls.add(buildLoadURL(url, id));
+			urls.add(buildLoadURL(id));
 		}
 
 		return urls;
@@ -126,7 +127,7 @@ public abstract class Manager<T extends Base> {
 		return list;
 	}
 
-	private Map<String, Object> getMethodMap(final String description, final String method, final String url, final boolean isSecured) {
+	Map<String, Object> getMethodMap(final String description, final String method, final String url, final boolean isSecured) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("url", url);
 		map.put("description", description);
@@ -145,9 +146,10 @@ public abstract class Manager<T extends Base> {
 
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String update(@Context HttpServletRequest request, final @Valid T base) throws Exception {
+	public String update(final @Valid T base) throws Exception {
 		getBean(BaseBean.JNDI).update(base);
-		return buildLoadURL(request, base.getId());
+		// return buildLoadURL(request, base.getId());
+		return buildLoadURL(base.getId());
 	}
 
 	@PUT
@@ -158,9 +160,10 @@ public abstract class Manager<T extends Base> {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String insert(@Context HttpServletRequest request, final @Valid T base) throws Exception {
+	public String insert(final @Valid T base) throws Exception {
 		final Base b = getBean(BaseBean.JNDI).insert(base);
-		return buildLoadURL(request, b.getId());
+		// return buildLoadURL(request, b.getId());
+		return buildLoadURL(b.getId());
 	}
 
 	protected BaseBean getBean(final String jndi) throws Exception {
@@ -183,19 +186,33 @@ public abstract class Manager<T extends Base> {
 		return map;
 	}
 
-	protected String buildLoadURL(String url, Object end) {
+	protected String buildLoadURL(Object end) {
+
+		String url = SERVER_URL + (this.getEntityClass() != null ? this.getClass().getAnnotation(Path.class).value() : "");
 
 		String endPart = end + "";
 		if (endPart.startsWith("/")) {
 			endPart = endPart.substring(1);
 		}
 
-		return url + (url.charAt(url.length() - 1) == '/' ? "" : "/") + endPart;
+		String finalURL = url + (url.charAt(url.length() - 1) == '/' ? "" : "/") + endPart;
+
+		return finalURL;
 	}
 
-	protected String buildLoadURL(HttpServletRequest request, Object id) {
-		final String url = request.getRequestURL().toString();
-		return buildLoadURL(url, id);
-	}
+	// protected String buildLoadURL(String url, Object end) {
+	//
+	// String endPart = end + "";
+	// if (endPart.startsWith("/")) {
+	// endPart = endPart.substring(1);
+	// }
+	//
+	// return url + (url.charAt(url.length() - 1) == '/' ? "" : "/") + endPart;
+	// }
+
+	// protected String buildLoadURL(HttpServletRequest request, Object id) {
+	// final String url = request.getRequestURL().toString();
+	// return buildLoadURL(url, id);
+	// }
 
 }

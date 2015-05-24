@@ -14,6 +14,8 @@ public class Organization extends Base {
 	@NotNull
 	@Column(length = 100, unique = true)
 	private String name;
+
+	@Column(length = 1000)
 	private String description;
 
 	@Column(length = 100)
